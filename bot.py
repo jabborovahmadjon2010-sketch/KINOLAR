@@ -1,18 +1,22 @@
 import os
 import telebot
 from telebot import types
+from keep_alive import keep_alive  # <-- keep_alive import qilindi
 
 # === Sizning ma'lumotlaringiz ===
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = os.getenv("BOT_TOKEN")  # Bot tokenni env variable orqali oling
 CHANNEL_USERNAME = "@kinolarxazinasi"
 # ================================
 
 bot = telebot.TeleBot(TOKEN)
 
+# Web serverni fon rejimida ishga tushirish
+keep_alive()
+
 # Kino bazasi (kod → kino ro‘yxati)
 films = {
     "385": [("Oq Ilon 1 (2019)", "BAACAgIAAyEFAAS0vosPAAMGaLzFCL_DDGrPj_B2_jVkz2gnsBsAAo-LAAImA-FJk1pIJvct9Rk2BA")],
-    "777": [("Titanik (1997)", "BAACAgIAAxkBAAIuQ2sQJfRHGz9kTnWvQk9P2sQ0...")]  # misol uchun
+    "777": [("Titanik (1997)", "BAACAgIAAxkBAAIuQ2sQJfRHGz9kTnWvQk9P2sQ0...")]
 }
 
 # Obunani tekshirish funksiyasi
@@ -34,8 +38,7 @@ def start(message):
         markup.add(btn2)
         bot.send_message(
             message.chat.id,
-            "👋 Assalomu alaykum!\n\n"
-            "📽 Kino olish uchun kanalimizga obuna bo‘ling 👇",
+            "👋 Assalomu alaykum!\n\n📽 Kino olish uchun kanalimizga obuna bo‘ling 👇",
             reply_markup=markup
         )
     else:
@@ -55,11 +58,9 @@ def callback(call):
             bot.answer_callback_query(call.id, "❌ Hali obuna bo‘lmadingiz!")
     else:
         try:
-            # callback_data = "kod_index"
             code, index = call.data.split("_")
             index = int(index) - 1
             title, file_id = films[code][index]
-
             bot.send_video(call.message.chat.id, file_id, caption=f"🎬 Kino: {title}")
         except Exception as e:
             bot.send_message(call.message.chat.id, f"❌ Xatolik: {e}")
@@ -75,7 +76,7 @@ def search_film(message):
     if code in films:
         keyboard = types.InlineKeyboardMarkup()
         for i, (title, file_id) in enumerate(films[code], start=1):
-            callback_data = f"{code}_{i}"  # faqat qisqa data
+            callback_data = f"{code}_{i}"
             keyboard.add(types.InlineKeyboardButton(text=f"{i}. {title}", callback_data=callback_data))
         bot.send_message(message.chat.id, f"🔎 Natijalar - {len(films[code])} ta", reply_markup=keyboard)
     else:
