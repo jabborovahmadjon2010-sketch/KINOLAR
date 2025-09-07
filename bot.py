@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 
 # === Sizning ma'lumotlaringiz ===
-TOKEN = "8336149912:AAHuZ8KAiFPKNlHL_e-4B-NPbQgqoJ0KZro"
+TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_USERNAME = "@kinolarxazinasi"
 # ================================
 
